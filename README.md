@@ -1,223 +1,134 @@
-# Dimdim WebApp — 2º Checkpoint
+# 💰 Dimdim WebApp - Checkpoint 2
 
-Projeto web desenvolvido em **.NET 9** para o checkpoint de Aplicações e Banco em Nuvem.
+## 📌 Descrição do Projeto
 
-## Objetivo
+Este projeto consiste no desenvolvimento de uma aplicação Web API em .NET 9, com o objetivo de gerenciar pedidos e seus respectivos itens, seguindo o modelo de relacionamento master-detail. A aplicação foi projetada para ser executada em ambiente de nuvem, utilizando serviços da Microsoft Azure.
 
-Criar uma API REST simples para gerenciamento de pedidos e seus itens, usando uma estrutura master-detail:
+A API foi publicada em um Web App na Azure e realiza operações completas de CRUD (Create, Read, Update e Delete), com persistência de dados em um banco Azure SQL Database. O banco de dados contém as tabelas **Pedidos** e **ItensPedido**, relacionadas por chave estrangeira, garantindo a integridade dos dados.
 
-- `Pedidos` — tabela master
-- `ItensPedido` — tabela detail
-- `ItensPedido.PedidoId` → `Pedidos.Id` por FK
+Todo o provisionamento da infraestrutura foi realizado via **Azure CLI**, incluindo a criação do Resource Group, Azure SQL Server, banco de dados e Web App. Além disso, foi configurado o **Application Insights** para monitoramento da aplicação.
 
-A persistência prevista para a entrega em nuvem é **Azure SQL Database (PaaS)**.
+---
 
-## Tecnologias
+## 👨‍💻 Integrantes
 
-- .NET 9 / ASP.NET Core Web API
-- Entity Framework Core 9
-- SQL Server / Azure SQL Database
-- Swagger
-- Docker
-- Azure CLI
-- Azure App Service
-- Azure Container Registry
-- Application Insights
-- Health Check
+* Lucas Rafael Solimene – RM 565194
 
-## Estrutura
+---
+
+## 🌐 Link do Projeto
+
+🔗 https://github.com/LucasRafa22/DevOps-CP05
+
+---
+
+## 🧱 Tecnologias Utilizadas
+
+* .NET 9
+* ASP.NET Web API
+* Azure Web App
+* Azure SQL Database
+* Azure CLI
+* Application Insights
+
+---
+
+## 🗄️ Banco de Dados
+
+### Tabelas
+
+* **Pedidos**
+* **ItensPedido**
+
+### Relacionamento
 
 ```text
-src/
-  Dimdim.Api/
-    Controllers/
-    Program.cs
-    Dockerfile
-  Dimdim.Application/
-    DTOs/
-    Interfaces/
-  Dimdim.Domain/
-    Entities/
-  Dimdim.Infrastructure/
-    Data/
-    Repositories/
-database/
-  01_create_tables.sql
-  02_sample_data.sql
-  03_verification.sql
-scripts/
-  azure-deploy.sh
-  azure-deploy.ps1
-docs/
+Pedidos (1) → (N) ItensPedido
 ```
 
-## Executar localmente
+---
 
-Pré-requisitos:
+## 🔁 Endpoints Principais
 
-- .NET SDK 9
-- SQL Server local ou Azure SQL
-- Docker (opcional para execução em container)
-- Azure CLI para deploy
+### POST /api/pedidos
+
+Cria um novo pedido
+
+```json
+{
+  "clienteNome": "Lucas Rafael"
+}
+```
+
+---
+
+### GET /api/pedidos
+
+Retorna todos os pedidos
+
+---
+
+### PUT /api/pedidos/{id}
+
+```json
+{
+  "clienteNome": "Lucas Atualizado"
+}
+```
+
+---
+
+### DELETE /api/pedidos/{id}
+
+Remove um pedido
+
+---
+
+## ❤️ Health Check
+
+```
+GET /health
+```
+
+---
+
+## 📊 Monitoramento
+
+A aplicação utiliza **Application Insights** para monitoramento de requisições, desempenho e falhas.
+
+---
+
+## ⚙️ Deploy na Azure
+
+Resumo dos principais comandos:
 
 ```bash
-dotnet restore
-dotnet build
-dotnet run --project src/Dimdim.Api
+az group create
+az sql server create
+az sql db create
+az webapp create
+az webapp deploy
 ```
 
-Swagger:
+📌 O passo a passo completo está disponível no arquivo **HOW_TO.md**
 
-`http://localhost:5080/swagger`
+---
 
-Health:
+## 📂 Estrutura do Projeto
 
-`http://localhost:5080/health`
-
-## Banco
-
-Para SQL Server local, configure a connection string `DimdimDb` em:
-
-`src/Dimdim.Api/appsettings.Development.json`
-
-Para Azure, a connection string é configurada no App Service pelo script de deploy.
-
-Execute o DDL:
-
-`database/01_create_tables.sql`
-
-Depois, se quiser dados de demonstração:
-
-`database/02_sample_data.sql`
-
-Para conferir a persistência:
-
-`database/03_verification.sql`
-
-## API
-
-### Pedidos
-
-- `GET /api/pedidos`
-- `GET /api/pedidos/{id}`
-- `POST /api/pedidos`
-- `PUT /api/pedidos/{id}`
-- `DELETE /api/pedidos/{id}`
-
-### Itens de pedido
-
-- `GET /api/itens-pedido`
-- `GET /api/itens-pedido/{id}`
-- `PUT /api/itens-pedido/{id}`
-- `DELETE /api/itens-pedido/{id}`
-- `GET /api/pedidos/{pedidoId}/itens`
-- `POST /api/pedidos/{pedidoId}/itens`
-
-O `POST` de item usa o pedido master na própria rota, garantindo a FK.
-
-## JSON para demonstração
-
-### POST Pedido
-
-```json
-{
-  "clienteNome": "Maria Silva"
-}
+```
+/src
+/docs
+/scripts
+/database
+README.md
+HOW_TO.md
 ```
 
-### PUT Pedido
+---
 
-```json
-{
-  "clienteNome": "Maria Souza"
-}
-```
+## 📘 Observações
 
-### POST Item
-
-```json
-{
-  "pedidoId": "ID_DO_PEDIDO_CRIADO",
-  "descricao": "Plano mensal",
-  "quantidade": 2,
-  "precoUnitario": 29.90
-}
-```
-
-### PUT Item
-
-```json
-{
-  "descricao": "Plano mensal atualizado",
-  "quantidade": 3,
-  "precoUnitario": 31.90
-}
-```
-
-## Deploy Azure
-
-O deploy foi preparado via Azure CLI e Docker.
-
-1. Faça login:
-
-```bash
-az login
-```
-
-2. Edite a senha do SQL no script.
-
-3. Execute:
-
-Linux/macOS:
-```bash
-chmod +x scripts/azure-deploy.sh
-./scripts/azure-deploy.sh
-```
-
-PowerShell:
-```powershell
-.\scriptszure-deploy.ps1
-```
-
-O script cria:
-
-- Resource Group
-- Azure Container Registry
-- SQL Server lógico
-- Azure SQL Database
-- Firewall para serviços Azure
-- Application Insights
-- App Service Plan
-- Web App para o container
-
-Após o provisionamento, execute `database/01_create_tables.sql` no Azure SQL e teste `/swagger` e `/health`.
-
-## Application Insights
-
-A API possui integração com Application Insights pelo pacote `Microsoft.ApplicationInsights.AspNetCore`. No ambiente Azure, configure a connection string do recurso de Application Insights como configuração da aplicação antes da demonstração.
-
-## Demonstração
-
-A avaliação deve mostrar:
-
-1. API publicada no Azure.
-2. Swagger funcionando.
-3. `POST` criando um pedido.
-4. `POST` criando itens vinculados ao pedido.
-5. `GET` consultando os dados.
-6. `PUT` alterando dados.
-7. `DELETE` removendo dados.
-8. Consulta direta no Azure SQL após as operações.
-9. `/health` funcionando.
-10. Application Insights registrando a aplicação.
-
-## Link do vídeo
-
-> **Vídeo da apresentação:** _______________________________________________
-
-## Integrantes
-
-- __________________________________
-- __________________________________
-- __________________________________
-- __________________________________
+* A aplicação foi validada com persistência real no Azure SQL Database
+* Todas as operações CRUD foram testadas via Swagger
+* Evidências encontram-se no PDF da entrega
